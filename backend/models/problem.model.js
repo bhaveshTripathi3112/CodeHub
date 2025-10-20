@@ -16,7 +16,7 @@ const problemSchema = new Schema({
     },
     tags:{
         type:String,
-        enum:['array','linked list','graph','tree','stack','queue','dp','strings'],
+        enum:['array','linked list','graph','tree','stack','queue','dp','strings','search'],
         required:true
     },
     visibleTestCases:[
@@ -54,6 +54,18 @@ const problemSchema = new Schema({
                 required:true
             },
             initialCode:{
+                type:String,
+                required:true
+            }
+        }
+    ],
+    referenceSolution:[
+        {
+            language:{
+                type:String,
+                required:true
+            },
+            completeCode:{
                 type:String,
                 required:true
             }

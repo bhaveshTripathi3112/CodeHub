@@ -1,6 +1,6 @@
 import { redisClient } from "../config/redis.js";
 import { User } from "../models/user.model.js";
-import validate from "../validator.js";
+import validate from "../utils/validator.js";
 import bcrypt, { hash }  from "bcryptjs";
 import jwt from "jsonwebtoken"
 
@@ -107,11 +107,12 @@ export const adminRegister = async(req,res)=>{
         //hash the password
         req.body.password = await bcrypt.hash(password,10)
 
-        //to ensure invalid person doesnt register as admin
-        
+        //!to ensure invalid person doesnt register as admin
+        // req.body.role = 'admin'
 
         const user = await User.create(req.body)
 
+        //! here ww will not generate token for when admin registers someone as if we here will generate token so the current admin will automatically we logged out
         // //generate token 
         // const token = jwt.sign({_id:user._id,emailId , role:user.role},process.env.JWT_KEY ,{expiresIn : 7*24*60*60})
 

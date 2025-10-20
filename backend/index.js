@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js"
 import cookieParser from "cookie-parser"
 import authRouter from "./routes/userAuth.routes.js"
 import { redisClient } from "./config/redis.js"
+import problemRouter from "./routes/problem.routes.js"
 
 const app = express()
 
@@ -16,11 +17,11 @@ app.use(cookieParser())
 const port = process.env.PORT || 5000
 
 app.use("/user",authRouter)
+app.use("/problem",problemRouter)
 
 const initilaizeConnection = async ()=>{
     try {
         await Promise.all([connectDB(),redisClient.connect()])
-        console.log("DB connected");
         app.listen(port , () =>{
             console.log(`Server running on port ${port}`);
         })
