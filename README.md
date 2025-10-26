@@ -190,14 +190,12 @@ Backend → http://localhost:5000
 ---
 ## 🧑‍💻 Author
 
-*👨‍💻 Bhavesh Tripathi**
-*📧 Email: bhaveshtripathi3112@.com**
+**👨‍💻 Bhavesh Tripathi**  
+📧 [bhaveshtripathi3112@gmail.com](mailto:bhaveshtripathi3112@gmail.com)  
+💼 [LinkedIn](https://www.linkedin.com/in/bhavesh-tripathi-a69483309)  
+🐙 [GitHub](https://github.com/bhaveshTripathi3112)
 
-<!-- 🔗 Portfolio: your-portfolio-link.com -->
-
-*💼 LinkedIn: linkedin.com/in/bhavesh-tripathi-a69483309/**
-
-*🐙 GitHub: [github.com/bhaveshTripathi3112]**
+<!-- 🔗 [Portfolio](https://your-portfolio-link.com) -->
 
 ---
 
