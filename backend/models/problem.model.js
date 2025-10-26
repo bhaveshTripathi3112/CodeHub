@@ -79,3 +79,17 @@ const problemSchema = new Schema({
 },{timestamps:true})
 
 export const Problem = mongoose.model("Problem",problemSchema)
+
+
+
+//tags: {
+//   type: [String],
+//   enum: ['array', 'linked list', 'graph', 'tree', 'stack', 'queue', 'dp', 'strings', 'search'],
+//   required: true,
+//   validate: {
+//     validator: function (arr) {
+//       return arr.length > 0; // at least one tag required
+//     },
+//     message: 'At least one tag must be specified'
+//   }
+// }

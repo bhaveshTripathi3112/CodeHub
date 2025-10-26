@@ -1,4 +1,5 @@
 import { redisClient } from "../config/redis.js";
+import { Submission } from "../models/submission.model.js";
 import { User } from "../models/user.model.js";
 import validate from "../utils/validator.js";
 import bcrypt, { hash }  from "bcryptjs";
@@ -7,8 +8,10 @@ import jwt from "jsonwebtoken"
 
 export const register = async(req,res)=>{
     try {
+        console.log("Incoming body:", req.body);
         //validate the data
         validate(req.body)
+        console.log("Validation passed");
 
         const {firstName , emailId , password} = req.body
 
@@ -31,7 +34,16 @@ export const register = async(req,res)=>{
             maxAge:7*24*60*60*1000
         })
 
-        res.status(201).send("User Registered Successfully")
+        const reply={
+            firstName : user.firstName,
+            emailId : user.emailId,
+            _id : user._id
+        }
+
+        res.status(201).json({
+            user:reply,
+            message:"User registered successfully"
+        })
 
     } catch (error) {
         res.status(400).json({message:error.message})
@@ -52,6 +64,13 @@ export const login = async(req,res)=>{
         if(!match){
             throw new Error("Invalid Credentials")
         }
+
+        const reply={
+            firstName : user.firstName,
+            emailId : user.emailId,
+            _id : user._id
+        }
+
         const token = jwt.sign({_id:user._id,emailId , role:user.role},process.env.JWT_KEY ,{expiresIn : 7*24*60*60})
 
         //cookie
@@ -62,7 +81,10 @@ export const login = async(req,res)=>{
             maxAge:7*24*60*60*1000
         })
 
-        res.status(200).send("Logged In Successfully")
+        res.status(201).json({
+            user:reply,
+            message:"Login Successful"
+        })
 
 
     } catch (error) {
@@ -131,5 +153,19 @@ export const adminRegister = async(req,res)=>{
 
     } catch (error) {
         res.status(400).json({message:error.message})
+    }
+}
+
+
+export const deleteProfile = async(req,res)=>{
+    try {
+        const userId = req.result._id
+
+        await User.findByIdAndDelete(userId)
+        // await Submission.deleteMany({userId})
+
+        res.status(200).send("Deleted Successfully")
+    } catch (error) {
+       return res.status(500).json({ message: error.message || "Internal Server Error" })
     }
 }

@@ -6,18 +6,27 @@ import cookieParser from "cookie-parser"
 import authRouter from "./routes/userAuth.routes.js"
 import { redisClient } from "./config/redis.js"
 import problemRouter from "./routes/problem.routes.js"
-
+import cors from 'cors';
+import submitRouter from "./routes/submission.routes.js"
 const app = express()
 
 //middleware
 app.use(express.json())
 // app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
+app.use(
+  cors({
+    origin: 'http://localhost:5173',  // your frontend URL
+    credentials: true,                 // allow cookies/auth headers
+  })
+);
 
 const port = process.env.PORT || 5000
 
+//routes
 app.use("/user",authRouter)
 app.use("/problem",problemRouter)
+app.use("/submission",submitRouter)
 
 const initilaizeConnection = async ()=>{
     try {

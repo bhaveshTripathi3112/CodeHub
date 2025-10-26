@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new mongoose.Schema({
     firstName:{
@@ -31,7 +31,11 @@ const userSchema = new mongoose.Schema({
         default:'user'
     },
     problemSolved:{
-        type:[String]
+        type:[{
+            type:Schema.Types.ObjectId,
+            ref:'Problem'
+        }],
+        unique:true
     },
     password:{
         type:String,
@@ -39,5 +43,12 @@ const userSchema = new mongoose.Schema({
     }
 
 },{timestamps:true})
+
+
+userSchema.post('findOneAndDelete' , async function (userInfo) {
+    if(userInfo){
+        await mongoose.model('submission').deleteMany({userId : userInfo._id})
+    }
+})
 
 export const User = mongoose.model("User",userSchema)

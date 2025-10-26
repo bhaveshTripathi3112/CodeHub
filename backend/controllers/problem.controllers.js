@@ -1,4 +1,6 @@
 import { Problem } from "../models/problem.model.js"
+import { Submission } from "../models/submission.model.js"
+import { User } from "../models/user.model.js"
 import { getLanguageById, submitBatch, submitToken } from "../utils/problem.utility.js"
 
 
@@ -35,7 +37,7 @@ export const createProblem = async(req,res)=>{
             const testResult = await submitToken(resultToken)
 
             
-            // console.log(testResult);
+            // console.log(testResult);  // this is output from judge0
             
             
             
@@ -62,7 +64,6 @@ export const createProblem = async(req,res)=>{
         res.status(400).json({message:error.message})
     }
 }
-
 
 export const updateProblem = async(req,res)=>{
     const {id} =  req.params
@@ -173,7 +174,7 @@ export const getAllProblem = async(req,res)=>{
     try {
        
         
-        const getProblem = await Problem.find({})
+        const getProblem = await Problem.find({}).select("_id title difficultyLevel tags ")
 
         if(getProblem.length == 0){
             return res.status(404).send("Problem is missing")
@@ -186,5 +187,32 @@ export const getAllProblem = async(req,res)=>{
 }
 
 export const solvedAllProblemByUser = async(req,res)=>{
-    
+    try {
+        
+        const userId = req.result._id
+        const user = await User.findById(userId).populate({
+            path:"problemSolved",
+            select:"_id title difficultyLevel tags"
+        })
+        res.status(200).send(user.problemSolved)
+
+    } catch (error) {
+        res.status(500).send("Error "+error || "Internal Server Error")
+    }
+}
+
+export const submittedProblem = async(req,res)=>{
+    try {
+        const userId = req.result._id
+        const problemId = req.params.pid
+        const ans = await Submission.find({userId , problemId})
+
+        if(ans.length == 0){
+            return res.status(200).send("No submission")
+        }
+
+        return res.status(200).send(ans)
+    } catch (error) {
+        return res.status(500).send("Internal server error")
+    }
 }

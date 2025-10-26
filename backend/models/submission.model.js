@@ -18,7 +18,7 @@ const submissionSchema = new Schema({
     language:{
         type:String,
         required:true,
-        enum:['javascript', 'cpp' , 'java' ] //expanded language support
+        enum:['javascript', 'c++' , 'java' ] //expanded language support
     },
     status:{
         type:String,
@@ -47,5 +47,8 @@ const submissionSchema = new Schema({
         default:0
     }
 },{timestamps:true})
+
+//creating compound index
+submissionSchema.index({userId:1 , problemId:1})  
 
 export const Submission = mongoose.model("Submission",submissionSchema)

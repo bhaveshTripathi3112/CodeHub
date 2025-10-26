@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { createProblem, deleteProblem, getAllProblem, getProblemById, updateProblem } from "../controllers/problem.controllers.js"
+import { createProblem, deleteProblem, getAllProblem, getProblemById, solvedAllProblemByUser, submittedProblem, updateProblem } from "../controllers/problem.controllers.js"
 import { adminMiddleware } from "../middleware/adminMiddleware.js"
 import { userMiddleware } from "../middleware/user.middleware.js"
 
@@ -11,15 +11,15 @@ const problemRouter = Router()
 //update problem
 //delete problem
 
-//requires admin access only
+//requires admin access 
 problemRouter.post("/create",adminMiddleware,createProblem)
 problemRouter.put("/update/:id",adminMiddleware,updateProblem) 
 problemRouter.delete("/delete/:id",adminMiddleware,deleteProblem)
 
 
-// //user can access
+//user can access
 problemRouter.get("/ProblemById/:id",userMiddleware,getProblemById)  // to fetch individual problem
 problemRouter.get("/getAllProblem",userMiddleware,getAllProblem)   // to fetch all problems
-// problemRouter.get("/ProblemSolvedByUser",userMiddleware,solvedAllProblemByUser)  // to get total no of solved problem
-
+problemRouter.get("/problemSolvedByUser",userMiddleware,solvedAllProblemByUser)  // to get total no of solved problem
+problemRouter.get("/submittedProblem/:pid",userMiddleware,submittedProblem)
 export default problemRouter
