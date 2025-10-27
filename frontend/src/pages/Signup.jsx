@@ -54,6 +54,12 @@ function Signup() {
   const submittedData = (data) => {
     dispatch(registerUser(data))
   }
+
+  if(loading){
+    return <div className="min-h-screen flex items-center justify-center">
+      <span className="loading loading-spinner loading-lg"></span>
+    </div>
+  }
       
   return (
       
@@ -87,6 +93,7 @@ function Signup() {
         <form onSubmit={handleSubmit(submittedData)} className="space-y-8 text-xl">
           {/* Name */}
           <div>
+    
             <input
               {...register("firstName")}
               type="text"
@@ -136,8 +143,9 @@ function Signup() {
             whileTap={{ scale: 0.97 }}
             type="submit"
             className="btn btn-primary w-full text-xl py-4 mt-4"
+            disabled={loading}
           >
-            Sign Up
+            {loading ?'Signing Up' : 'Sign Up' }
           </motion.button>
         </form>
 

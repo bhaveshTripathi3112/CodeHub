@@ -37,7 +37,8 @@ export const register = async(req,res)=>{
         const reply={
             firstName : user.firstName,
             emailId : user.emailId,
-            _id : user._id
+            _id : user._id,
+            role: user.role
         }
 
         res.status(201).json({
@@ -68,7 +69,8 @@ export const login = async(req,res)=>{
         const reply={
             firstName : user.firstName,
             emailId : user.emailId,
-            _id : user._id
+            _id : user._id,
+            role: user.role
         }
 
         const token = jwt.sign({_id:user._id,emailId , role:user.role},process.env.JWT_KEY ,{expiresIn : 7*24*60*60})
