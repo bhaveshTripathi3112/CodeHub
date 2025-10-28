@@ -125,9 +125,9 @@ Below is a detailed list of all REST API endpoints available in CodeHub, categor
 | `userMiddleware`  | Validates the JWT token and authorizes logged-in users |
 | `adminMiddleware` | Verifies that the logged-in user has admin privileges  |
 
----
 
-## 🔧 Installation & Setup
+
+<!-- ## 🔧 Installation & Setup
 
 1. **Clone the Repository**
 ```
@@ -171,7 +171,7 @@ The app will run on:
 
 Frontend → http://localhost:5173
 
-Backend → http://localhost:5000
+Backend → http://localhost:5000 -->
 
 ---
 ## Future Enhancements

@@ -1,29 +1,24 @@
-import {Routes,Route, Navigate } from "react-router";
+import { Routes, Route } from "react-router";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import { checkAuth } from "./authSlice";
-import {useDispatch , useSelector} from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import Adminpanel from "./pages/Adminpanel";
 import ProblemsPage from "./pages/ProblemsPage";
+import SolveProblemPage from "./pages/SolveProblemPage";
+import AboutPage from "./pages/AboutPage";
+import ProfilePage from "./pages/ProfilePage";
+import HomePage from "./pages/HomePage";
+import Navbar from "./components/Navbar"; // ✅ Import Navbar
 
 function App() {
+  const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
-  //code to check whether user is authenticated or not
-  const {isAuthenticated , user , loading} = useSelector((state)=>state.auth)
-  const dispatch = useDispatch()
-
-  useEffect(() =>{
-    
-    dispatch(checkAuth())
-    
-  },[dispatch])
-
-  console.log(user);
-  console.log(isAuthenticated);
-  
-  
-
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -33,22 +28,45 @@ function App() {
     );
   }
 
-
   return (
-  <>
-    <Routes>
-      <Route path="/" element={isAuthenticated ? <ProblemsPage></ProblemsPage> : <Navigate to="/signup" />}></Route>
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login></Login>} ></Route>
-      <Route path="/signup" element={isAuthenticated ? <Navigate to="/" /> : <Signup></Signup>}></Route>
-      {/* <Route path="/admin" element={
-        isAuthenticated && user?.role ==='admin' ? <Adminpanel/>  : <Navigate to='/'/>}>
-      </Route> */}
+    <>
+      {/* ✅ Navbar always visible */}
+      <Navbar />
 
-      <Route path="/admin" element={<Adminpanel></Adminpanel>}></Route>
-      
-    </Routes>
-  </>
-  )
+      <Routes>
+        {/* ✅ Always show HomePage */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* ✅ Public Routes */}
+        <Route
+          path="/login"
+          element={!isAuthenticated ? <Login /> : <HomePage />}
+        />
+        <Route
+          path="/signup"
+          element={!isAuthenticated ? <Signup /> : <HomePage />}
+        />
+
+        {/* ✅ Authenticated Routes */}
+        <Route path="/problems" element={<ProblemsPage />} />
+        <Route path="/problem/:id" element={<SolveProblemPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+
+        {/* ✅ Admin Route */}
+        <Route
+          path="/admin"
+          element={
+            isAuthenticated && user?.role === "admin" ? (
+              <Adminpanel />
+            ) : (
+              <HomePage />
+            )
+          }
+        />
+      </Routes>
+    </>
+  );
 }
 
-export default App
+export default App;

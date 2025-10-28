@@ -139,7 +139,48 @@ export const runCode = async(req,res)=>{
 
         const testResult = await submitToken(resultToken)
 
-        return res.status(201).send(testResult)
+        const submittedResult =({
+            userId,
+            problemId,
+            code,
+            language,
+            testCasesPassed:0,
+            status:'pending',
+            testCasesTotal:problem.hiddenTestCases.length
+        })
+
+        // 1 . check for error
+        let testCasesPassed = 0
+        let runtime = 0, memory = 0
+        let status = 'accepted'
+        let errorMessage = null
+
+       for(const test of testResult){
+            if(test.status_id == 3){
+                testCasesPassed++;
+                runtime = runtime + parseFloat(test.time)
+                memory = Math.max(memory , test.memory)
+            }
+            else{
+                if(test.status_id == 4){
+                    status = 'error'
+                    errorMessage = test.stderr
+                }
+                else{
+                    status = 'wrong'
+                    errorMessage = test.stderr
+                }
+            }
+        }
+
+        //2.store the result in Database in submission
+        submittedResult.status = status
+        submittedResult.testCasesPassed = testCasesPassed
+        submittedResult.errorMessage = errorMessage
+        submittedResult.runtime = runtime
+        submittedResult.memory = memory
+
+        return res.status(201).send(submittedResult)
 
 
     } catch (error) {
