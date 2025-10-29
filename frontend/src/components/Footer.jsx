@@ -13,16 +13,16 @@ const Footer = () => {
           <p className="text-sm mt-2 text-gray-500">Made with ❤️ by Bhavesh Tripathi</p>
         </div>
         <div className="flex gap-6">
-          <a href="https://github.com/" target="_blank" rel="noreferrer" className="hover:text-white">
+          <a href="https://github.com/bhaveshTripathi3112" target="_blank" rel="noreferrer" className="hover:text-white">
             <Github />
           </a>
-          <a href="https://linkedin.com/" target="_blank" rel="noreferrer" className="hover:text-white">
+          <a href="https://linkedin.com/in/bhavesh-tripathi-a69483309/" target="_blank" rel="noreferrer" className="hover:text-white">
             <Linkedin />
           </a>
           <a href="https://twitter.com/" target="_blank" rel="noreferrer" className="hover:text-white">
             <Twitter />
           </a>
-          <a href="mailto:contact@codehub.dev" className="hover:text-white">
+          <a href="mailto:bhaveshtripathi3112@gmail.com" className="hover:text-white">
             <Mail />
           </a>
         </div>

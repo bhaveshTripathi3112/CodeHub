@@ -111,9 +111,66 @@ export const logout = async(req,res)=>{
     }
 }
 
-export const getProfile = async(req,res)=>{
-    // is to be written 
-}
+export const getProfile = async (req, res) => {
+  try {
+    //Allow both user and admin access
+    const userId = req.params.id || req.user?._id || req.result?._id; 
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: user ID missing",
+      });
+    }
+
+    // Fetch user and populate solved problems
+    const user = await User.findById(userId)
+      .select("-password -__v")
+      .populate({
+        path: "problemSolved",
+        select: "title difficultyLevel tags",
+      });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    
+    const userProfile = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      emailId: user.emailId,
+      role: user.role,
+      totalSolved: user.problemSolved.length,
+      problemsSolved: user.problemSolved.map((p) => ({
+        id: p._id,
+        title: p.title,
+        difficulty: p.difficultyLevel,
+        tags: p.tags,
+      })),
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "User profile fetched successfully",
+      data: userProfile,
+    });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 
 export const adminRegister = async(req,res)=>{
     try {
@@ -132,7 +189,7 @@ export const adminRegister = async(req,res)=>{
         req.body.password = await bcrypt.hash(password,10)
 
         //!to ensure invalid person doesnt register as admin
-        // req.body.role = 'admin'
+        req.body.role = 'admin'
 
         const user = await User.create(req.body)
 
@@ -171,3 +228,29 @@ export const deleteProfile = async(req,res)=>{
        return res.status(500).json({ message: error.message || "Internal Server Error" })
     }
 }
+
+
+export const getAllUsers = async (req, res) => {
+  try {
+    // Only admin can access
+    if (req.result.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied! Admins only.",
+      });
+    }
+
+    const users = await User.find().select("-password"); // exclude password
+    res.status(200).json({
+      success: true,
+      message: "All users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};

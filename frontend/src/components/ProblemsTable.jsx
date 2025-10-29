@@ -49,7 +49,7 @@ function ProblemsTable({ filteredProblems, solvedProblems }) {
                   >
                     <td className="px-6 py-4">
                       {isSolved ? (
-                        <span className="text-green-500 text-lg">✓</span>
+                        <span className="text-green-500 text-lg">🟢</span>
                       ) : (
                         <span className="text-gray-600">○</span>
                       )}

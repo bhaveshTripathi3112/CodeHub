@@ -186,11 +186,12 @@ export default function SolveProblemPage() {
 
         {/* Description */}
         {activeTab === "description" && (
+          
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <h1 className="text-2xl font-bold text-yellow-400">
               {problem.title}
             </h1>
-            <p className="text-gray-300 whitespace-pre-line">
+            <p className="text-gray-300 whitespace-pre-line" style={{ whiteSpace: "pre-line" }}>
               {problem.description}
             </p>
 
@@ -219,16 +220,16 @@ export default function SolveProblemPage() {
               >
                 <p className="text-sm mb-2">
                   <strong>Input:</strong>
-                  <pre className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
+                  <div className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
                     {String(t.input)}
-                  </pre>
+                  </div>
                 </p>
 
                 <p className="text-sm mb-2">
                   <strong>Expected Output:</strong>
-                  <pre className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
+                  <p className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
                     {String(t.output)}
-                  </pre>
+                  </p>
                 </p>
 
                 {t.explanation && (
@@ -244,55 +245,88 @@ export default function SolveProblemPage() {
 
         {/* Submissions */}
         {activeTab === "submissions" && (
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-3 text-white">
+          
+          <div className="bg-[#0e1117] p-6 rounded-2xl border border-gray-800 shadow-lg">
+            {/* Header */}
+            <h2 className="text-2xl font-semibold mb-5 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               Your Submissions
             </h2>
 
             {loadingSubmissions ? (
-              <p className="text-gray-400">Loading submissions...</p>
+              <p className="text-gray-400 animate-pulse">Loading submissions...</p>
             ) : submissions.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {submissions.map((submission) => (
                   <div
                     key={submission._id}
                     onClick={() => handleViewSubmission(submission)}
-                    className={`p-3 rounded cursor-pointer transition-all ${
-                      selectedSubmission?._id === submission._id
-                        ? "bg-green-700 border border-green-500"
-                        : "bg-gray-700 hover:bg-gray-600"
-                    }`}
+                    className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer 
+                      ${
+                        selectedSubmission?._id === submission._id
+                          ? "border-blue-500 bg-blue-500/10 shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+                          : "border-gray-800 hover:border-gray-700 hover:bg-[#1a1d25]"
+                      }`}
                   >
-                    <p className="text-sm text-white font-medium">
-                      Status:{" "}
-                      <span
-                        className={
-                          submission.status === "accepted"
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }
-                      >
-                        {submission.status}
-                      </span>
-                    </p>
-                    <p className="text-gray-300 text-sm">
-                      Runtime: {submission.runtime}s | Memory:{" "}
-                      {submission.memory}KB
-                    </p>
-                    <p className="text-gray-400 text-xs">
-                      Submitted on:{" "}
-                      {new Date(submission.createdAt).toLocaleString("en-IN")}
-                    </p>
+                    {/* Top Row - Status and Date */}
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                            submission.status === "accepted"
+                              ? "bg-green-600/20 text-green-400 border border-green-500/30"
+                              : submission.status === "runtime error"
+                              ? "bg-yellow-600/20 text-yellow-400 border border-yellow-500/30"
+                              : "bg-red-600/20 text-red-400 border border-red-500/30"
+                          }`}
+                        >
+                          {submission.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        {new Date(submission.createdAt).toLocaleString("en-IN")}
+                      </p>
+                    </div>
+
+                    {/* Middle Row - Details */}
+                    <div className="flex items-center justify-between text-sm text-gray-300">
+                      <div>
+                        <p>
+                          <span className="text-gray-400">Runtime:</span>{" "}
+                          <span className="font-medium text-white">
+                            {submission.runtime}s
+                          </span>
+                        </p>
+                        <p>
+                          <span className="text-gray-400">Memory:</span>{" "}
+                          <span className="font-medium text-white">
+                            {submission.memory}KB
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="text-gray-400 text-xs italic">
+                        Language:{" "}
+                        <span className="text-gray-200 font-medium">
+                          {submission.language || "C++"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-sm mt-2">
-                You haven’t submitted any solution for this problem yet.
-              </p>
+              <div className="flex flex-col items-center justify-center py-10">
+                <p className="text-gray-400 text-sm mb-2">
+                  You haven’t submitted any solutions yet.
+                </p>
+                <p className="text-gray-500 text-xs">
+                  Solve the problem and view your submissions here!
+                </p>
+              </div>
             )}
           </div>
         )}
+
 
         {/* Solution */}
         {activeTab === "solution" && hasAccepted && (
@@ -384,96 +418,96 @@ export default function SolveProblemPage() {
         </div>
 
        {/* Sample test cases with navbar tabs */}
-<div className="mt-6">
-  <h3 className="text-md font-semibold text-blue-400 mb-3">
-    Sample Test Cases
-  </h3>
+        <div className="mt-6">
+          <h3 className="text-md font-semibold text-blue-400 mb-3">
+            Sample Test Cases
+          </h3>
 
-  {/* State to handle active tab */}
-  {problem.visibleTestCases?.length > 0 && (
-    <div className="flex flex-wrap gap-2 mb-4">
-      {problem.visibleTestCases.map((_, i) => (
-        <button
-          key={i}
-          onClick={() => setActiveTestCase(i)}
-          className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-            activeTestCase === i
-              ? "bg-blue-600 text-white"
-              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-          }`}
-        >
-          Test Case {i + 1}
-        </button>
-      ))}
-    </div>
-  )}
-
-  {/* Display active test case */}
-  {problem.visibleTestCases?.[activeTestCase] && (() => {
-    const t = problem.visibleTestCases[activeTestCase];
-    const passed =
-      testCaseResults.length > 0 && testCaseResults[activeTestCase] === true;
-    const failed =
-      testCaseResults.length > 0 && testCaseResults[activeTestCase] === false;
-
-    return (
-      <motion.div
-        key={activeTestCase}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`border rounded-md p-3 mb-3 transition ${
-          passed
-            ? "bg-green-900/20 border-green-500"
-            : failed
-            ? "bg-red-900/20 border-red-500"
-            : "bg-[#1a1c23] border-gray-700"
-        }`}
-      >
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-sm mb-2">
-              <strong>Input:</strong>
-              <pre className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-md p-2 mt-1">
-                {String(t.input)}
-              </pre>
-            </p>
-
-            <p className="text-sm mb-2">
-              <strong>Expected Output:</strong>
-              <pre className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-md p-2 mt-1">
-                {String(t.output)}
-              </pre>
-            </p>
-
-            {t.explanation && (
-              <p className="text-xs text-gray-400 mt-1">
-                {t.explanation}
-              </p>
-            )}
-          </div>
-
-          <div className="text-right">
-            <div
-              className={`text-sm font-medium ${
-                passed
-                  ? "text-green-300"
-                  : failed
-                  ? "text-red-300"
-                  : "text-gray-400"
-              }`}
-            >
-              {testCaseResults.length === 0
-                ? "Not run"
-                : passed
-                ? "Passed"
-                : "Failed"}
+          {/* State to handle active tab */}
+          {problem.visibleTestCases?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {problem.visibleTestCases.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveTestCase(i)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                    activeTestCase === i
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  }`}
+                >
+                  Test Case {i + 1}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
+
+          {/* Display active test case */}
+          {problem.visibleTestCases?.[activeTestCase] && (() => {
+            const t = problem.visibleTestCases[activeTestCase];
+            const passed =
+              testCaseResults.length > 0 && testCaseResults[activeTestCase] === true;
+            const failed =
+              testCaseResults.length > 0 && testCaseResults[activeTestCase] === false;
+
+            return (
+              <motion.div
+                key={activeTestCase}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`border rounded-md p-3 mb-3 transition ${
+                  passed
+                    ? "bg-green-900/20 border-green-500"
+                    : failed
+                    ? "bg-red-900/20 border-red-500"
+                    : "bg-[#1a1c23] border-gray-700"
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm mb-2">
+                      <strong>Input:</strong>
+                      <div className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-md p-2 mt-1">
+                        {String(t.input)}
+                      </div>
+                    </p>
+
+                    <p className="text-sm mb-2">
+                      <strong>Expected Output:</strong>
+                      <pre className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-md p-2 mt-1">
+                        {String(t.output)}
+                      </pre>
+                    </p>
+
+                    {t.explanation && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        {t.explanation}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="text-right">
+                    <div
+                      className={`text-sm font-medium ${
+                        passed
+                          ? "text-green-300"
+                          : failed
+                          ? "text-red-300"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {testCaseResults.length === 0
+                        ? "Not run"
+                        : passed
+                        ? "Passed"
+                        : "Failed"}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })()}
         </div>
-      </motion.div>
-    );
-  })()}
-</div>
 
 
         {/* Output */}

@@ -17,7 +17,7 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // Handle scroll effect
+  // Scroll blur effect
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -55,9 +55,9 @@ const Navbar = () => {
           <span className="text-white">Code</span>Hub
         </NavLink>
 
-        {/* Center - Navigation Links */}
+        {/* Center - Links */}
         <div className="hidden md:flex space-x-8 text-gray-300 font-medium">
-          {["problems", "about", "contact"].map((path) => (
+          {["problems", "about", "discussion"].map((path) => (
             <NavLink
               key={path}
               to={`/${path}`}
@@ -102,7 +102,7 @@ const Navbar = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-[60px] w-44 bg-[#151820]/95 border border-gray-700 
+                    className="absolute right-0 top-[60px] w-48 bg-[#151820]/95 border border-gray-700 
                       rounded-xl shadow-lg overflow-hidden backdrop-blur-xl z-50"
                   >
                     <NavLink
@@ -112,6 +112,18 @@ const Navbar = () => {
                     >
                       Profile
                     </NavLink>
+
+                    {/* Admin Option */}
+                    {user?.role === "admin" && (
+                      <NavLink
+                        to="/admin"
+                        onClick={() => setDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
+                      >
+                        Admin Panel
+                      </NavLink>
+                    )}
+
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-400"

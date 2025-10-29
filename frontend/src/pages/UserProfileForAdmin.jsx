@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { axiosClient } from "../utils/axiosClient";
 import { motion } from "framer-motion";
-import { useParams } from "react-router"; // ✅ useParams for admin access
+import { useParams } from "react-router";
 
 const difficultyColor = {
   easy: "text-green-400 bg-green-400/10",
@@ -9,41 +9,37 @@ const difficultyColor = {
   hard: "text-red-400 bg-red-400/10",
 };
 
-export default function ProfilePage() {
+export default function UserProfileForAdmin() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); // ✅ optional userId (for admin view)
+  const { id } = useParams(); // ✅ user ID from admin route
 
   useEffect(() => {
     (async () => {
       try {
-        // ✅ Dynamic endpoint based on role
-        const endpoint = id ? `/user/getProfile/${id}` : "/user/getProfile";
-        const res = await axiosClient.get(endpoint);
+        const res = await axiosClient.get(`/user/getProfile/${id}`);
         setProfile(res.data.data);
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error("Error fetching user profile:", err);
       } finally {
         setLoading(false);
       }
     })();
   }, [id]);
 
-  if (loading) {
+  if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-300">
         Loading...
       </div>
     );
-  }
 
-  if (!profile) {
+  if (!profile)
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-400">
         Failed to load profile.
       </div>
     );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-gray-200 px-6 py-10">
@@ -78,11 +74,9 @@ export default function ProfilePage() {
                 {profile.totalSolved}
               </p>
             </div>
-            {profile.updatedAt && (
-              <p className="text-sm text-gray-500">
-                Last Updated: {new Date(profile.updatedAt).toLocaleString()}
-              </p>
-            )}
+            <p className="text-sm text-gray-500">
+              Last Updated: {new Date(profile.updatedAt).toLocaleString()}
+            </p>
           </div>
         </div>
 
@@ -104,14 +98,9 @@ export default function ProfilePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {profile.problemsSolved.map((p, i) => (
-                    <tr
-                      key={i}
-                      className="hover:bg-white/5 transition duration-150"
-                    >
-                      <td className="py-3 px-2 font-medium text-blue-400">
-                        {p.title}
-                      </td>
+                  {profile.problemsSolved.map((p) => (
+                    <tr key={p.id} className="hover:bg-white/5 transition duration-150">
+                      <td className="py-3 px-2 font-medium">{p.title}</td>
                       <td className="py-3 px-2">
                         <span
                           className={`px-2 py-1 rounded-lg text-sm font-semibold ${difficultyColor[p.difficulty]}`}

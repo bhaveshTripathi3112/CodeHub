@@ -6,7 +6,7 @@ function StatsSection() {
     { label: "Active Users", value: "10" },
     { label: "Problems Solved", value: "25" },
     { label: "Coding Challenges", value: "10" },
-    { label: "Global Reach", value: "1 Country" },
+    { label: "Global Reach", value: "0" },
   ];
 
   return (
