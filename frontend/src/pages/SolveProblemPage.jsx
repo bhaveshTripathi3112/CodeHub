@@ -1,5 +1,5 @@
 // src/pages/SolveProblemPage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import Editor from "@monaco-editor/react";
 import { motion } from "framer-motion";
@@ -25,6 +25,8 @@ export default function SolveProblemPage() {
   const [testCaseResults, setTestCaseResults] = useState([]); // array of booleans: true = passed
   const [hasAccepted, setHasAccepted] = useState(false);
   const [activeTestCase, setActiveTestCase] = useState(0);
+
+  const editorRef = useRef(null);  // this line is relates to disabling copy paste option
 
   // fetch problem once
   useEffect(() => {
@@ -150,6 +152,26 @@ export default function SolveProblemPage() {
     const resultsArray = Array.from({ length: total }, (_, i) => i < passed);
     setTestCaseResults(resultsArray);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleEditorDidMount = (editor, monaco) => {
+    editorRef.current = editor;
+
+    // Disable right-click context menu
+    editor.updateOptions({ contextmenu: false });
+
+    // Disable Ctrl+C / Ctrl+V / Ctrl+X shortcuts
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyC, () => {});
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, () => {});
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyX, () => {});
+
+    // Disable clipboard events
+    const domNode = editor.getDomNode();
+    if (domNode) {
+      ["copy", "paste", "cut", "contextmenu"].forEach((evt) => {
+        domNode.addEventListener(evt, (e) => e.preventDefault());
+      });
+    }
   };
 
   if (!problem) return <p className="p-6 text-gray-300">Loading problem...</p>;
@@ -413,7 +435,11 @@ export default function SolveProblemPage() {
             }
             value={code}
             onChange={(value) => setCode(value)}
-            options={{ automaticLayout: true }}
+            options={{
+              automaticLayout: true,
+              minimap: { enabled: false },
+            }}
+            onMount={handleEditorDidMount}
           />
         </div>
 

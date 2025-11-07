@@ -32,20 +32,24 @@ export const createProblem = async(req,res)=>{
             }))
 
             //submit batch to judge0
+            console.log(submissions);
+            
             const submitResult = await submitBatch(submissions)
-            // console.log(submitResult);
+            console.log(submitResult);
             const resultToken = submitResult.map((value) => value.token)
-
+            console.log(resultToken);
+            
             const testResult = await submitToken(resultToken)
 
             
-            // console.log(testResult);  // this is output from judge0
+            console.log(testResult);  // this is output from judge0
             
             
             
 
             for(const test of testResult){
                 if(test.status_id != 3 ){
+                    console.log("Test failed:", test);
                     return res.status(400).send("Error occured") 
 
                     //! in future i will specify specific error here for each status_id

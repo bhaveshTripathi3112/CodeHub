@@ -141,15 +141,23 @@ function CreateProblemPage() {
     console.log(cleanData);
     
     await axiosClient.post("/problem/create", cleanData);
-
+    
     showToast(" Problem created successfully!", "success");
     setTimeout(() => navigate("/admin"), 1500);
   } catch (err) {
-    console.error("Problem creation error:", err);
+      if (err.response) {
+      console.error("Backend responded with error:", err.response.data);
+      console.error("Status code:", err.response.status);
+    } else if (err.request) {
+      console.error("No response received:", err.request);
+    } else {
+      console.error("Error setting up request:", err.message);
+    }
     showToast("Error creating problem. Please try again.", "error");
-  } finally {
-    setIsSubmitting(false);
-  }
+    } 
+    finally {
+      setIsSubmitting(false);
+    }
 };
 
 
