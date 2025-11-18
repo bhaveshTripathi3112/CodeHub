@@ -396,36 +396,70 @@ function CreateProblemPage() {
                 exit={{ x: -20, opacity: 0 }}
                 className="space-y-6"
               >
-                {/* Visible Test Cases */}
-                <div className="bg-gray-900/70 rounded-xl p-6 border border-gray-700 shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-white flex items-center gap-2">Visible Test Cases</h2>
-                    <button
-                      type="button"
-                      onClick={() => appendVisible({ input: "", output: "", explanation: "" })}
-                      className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-all shadow-lg flex items-center gap-2"
-                    >
-                      <span>+</span> Add Test Case
-                    </button>
-                  </div>
+{/* Visible Test Cases */}
+<div className="bg-gray-900/70 rounded-xl p-6 border border-gray-700 shadow-xl">
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-xl font-semibold text-white flex items-center gap-2">Visible Test Cases</h2>
+    <button
+      type="button"
+      onClick={() => appendVisible({ input: "", output: "", explanation: "" })}
+      className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-all shadow-lg flex items-center gap-2"
+    >
+      <span>+</span> Add Test Case
+    </button>
+  </div>
 
-                  <div className="space-y-4">
-                    {visibleFields.map((field, index) => (
-                      <motion.div key={field.id} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-sm font-medium text-gray-300">Test Case {index + 1}</h3>
-                          {visibleFields.length > 1 && <button type="button" onClick={() => removeVisible(index)} className="text-red-400 hover:text-red-300 text-sm">Remove</button>}
-                        </div>
+  <div className="space-y-4">
+    {visibleFields.map((field, index) => (
+      <motion.div
+        key={field.id}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-medium text-gray-300">Test Case {index + 1}</h3>
+          {visibleFields.length > 1 && (
+            <button
+              type="button"
+              onClick={() => removeVisible(index)}
+              className="text-red-400 hover:text-red-300 text-sm"
+            >
+              Remove
+            </button>
+          )}
+        </div>
 
-                        <div className="space-y-3">
-                          <input placeholder="Input (e.g., [2,7,11,15], 9)" {...register(`visibleTestCases.${index}.input`)} className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                          <input placeholder="Output (e.g., [0,1])" {...register(`visibleTestCases.${index}.output`)} className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                          <input placeholder="Explanation" {...register(`visibleTestCases.${index}.explanation`)} className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
+        <div className="space-y-3">
+          <textarea
+            placeholder="Input (write in multiple lines)"
+            {...register(`visibleTestCases.${index}.input`)}
+            rows={4}
+            className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white
+            placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-y"
+          />
+
+          <textarea
+            placeholder="Output"
+            {...register(`visibleTestCases.${index}.output`)}
+            rows={2}
+            className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white
+            placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-y"
+          />
+
+          <textarea
+            placeholder="Explanation"
+            {...register(`visibleTestCases.${index}.explanation`)}
+            rows={2}
+            className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white
+            placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-y"
+          />
+        </div>
+      </motion.div>
+    ))}
+  </div>
+</div>
+
 
                 {/* Hidden Test Cases (DOCX/PDF only + preview) */}
                 <div className="bg-gray-900/70 rounded-xl p-6 border border-gray-700 shadow-xl">

@@ -15,7 +15,7 @@ export const getLeaderboard = async (req, res) => {
       const score =
         easyCount * 1 +
         mediumCount * 2 +
-        hardCount * 3;
+        hardCount * 4;
 
       return {
         userId: user._id,

@@ -91,25 +91,37 @@ export default function SolveProblemPage() {
     try {
       setIsRunning(true);
       setOutput("");
+
       const res = await axiosClient.post(`/submission/run/${id}`, {
         code,
         language,
       });
+
       const data = res.data;
 
       if (data.errorMessage) {
         setOutput(`Error: ${data.errorMessage}`);
         setTestCaseResults([]);
-      } else {
-        setOutput(
-          `Status: ${data.status}\nTest Cases Passed: ${data.testCasesPassed}/${data.testCasesTotal}\nRuntime: ${data.runtime} sec\nMemory: ${data.memory} KB`
-        );
-
-        const total = data.testCasesTotal ?? problem.visibleTestCases.length;
-        const passed = data.testCasesPassed ?? 0;
-        const resultsArray = Array.from({ length: total }, (_, i) => i < passed);
-        setTestCaseResults(resultsArray);
+        return;
       }
+
+      // ⭐ USE ONLY VISIBLE TEST CASES FOR RUN
+      const totalVisible = problem.visibleTestCases.length;
+
+      const passed = data.testCasesPassed ?? 0;
+
+      setOutput(
+        `Status: ${data.status}\n` +
+        `Test Cases Passed: ${passed}/${totalVisible}\n` +
+        `Runtime: ${data.runtime} sec\n` +
+        `Memory: ${data.memory} KB`
+      );
+
+      // Create UI results only for visible tests
+      const resultsArray = Array.from({ length: totalVisible }, (_, i) => i < passed);
+
+      setTestCaseResults(resultsArray);
+
     } catch (err) {
       console.error(err);
       setOutput("Error executing code");
@@ -419,7 +431,7 @@ const fetchHint = async () => {
           className="bg-[#1a1c23] p-4 mt-3 rounded-lg border border-grey-300"
         >
           <h2 className="text-xl font-semibold text-purple-400 mb-2">
-            🔍 Hint
+             Hint
           </h2>
           {/* Limit exceeded message */}
           {hintError && (
@@ -516,7 +528,7 @@ const fetchHint = async () => {
               automaticLayout: true,
               minimap: { enabled: false },
             }}
-            onMount={handleEditorDidMount}
+            // onMount={handleEditorDidMount}
           />
         </div>
 
