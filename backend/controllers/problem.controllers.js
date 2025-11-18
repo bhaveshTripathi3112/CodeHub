@@ -4,7 +4,7 @@ import { Submission } from "../models/submission.model.js"
 import { User } from "../models/user.model.js"
 import { getLanguageById, submitBatch, submitToken } from "../utils/problem.utility.js"
 import { Problem } from "../models/problem.model.js"
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const createProblem = async(req,res)=>{
     const {title ,  description , difficultyLevel , tags , visibleTestCases,
@@ -32,17 +32,17 @@ export const createProblem = async(req,res)=>{
             }))
 
             //submit batch to judge0
-            console.log(submissions);
+            // console.log(submissions);
             
             const submitResult = await submitBatch(submissions)
-            console.log(submitResult);
+            // console.log(submitResult);
             const resultToken = submitResult.map((value) => value.token)
-            console.log(resultToken);
+            // console.log(resultToken);
             
             const testResult = await submitToken(resultToken)
 
             
-            console.log(testResult);  // this is output from judge0
+            // console.log(testResult);  // this is output from judge0
             
             
             
@@ -222,3 +222,71 @@ export const submittedProblem = async(req,res)=>{
         return res.status(500).send("Internal server error")
     }
 }
+
+
+
+
+// INIT GEMINI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+export const getHint = async (req, res) => {
+  try {
+    const userId = req.result._id;
+    const problemId = req.params.id;   // FIXED 🔥
+
+    const user = await User.findById(userId);
+    const problem = await Problem.findById(problemId);
+
+    if (!problem) {
+      return res.status(404).json({ success: false, message: "Problem not found" });
+    }
+
+    // Find hint usage for this problem
+    let usage = user.hintUsage.find(
+      (h) => h.problemId.toString() === problemId.toString()  // FIXED 🔥
+    );
+
+    // Max 2 hints allowed
+    if (usage && usage.count >= 2) {
+      return res.status(403).json({
+        success: false,
+        message: "You have used your 2 available hints"
+      });
+    }
+
+    // Build prompt
+    const prompt = `
+      Provide ONLY A HINT, not the full solution.
+      Avoid giving code or explicit logic.
+
+      Problem Title: ${problem.title}
+      Difficulty: ${problem.difficultyLevel}
+      Description: ${problem.description}
+      Visible Test Cases: ${JSON.stringify(problem.visibleTestCases)}
+    `;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const result = await model.generateContent(prompt);
+    const hint = result.response.text();
+
+    // Update usage
+    if (!usage) {
+      user.hintUsage.push({ problemId, count: 1 });
+    } else {
+      usage.count += 1;
+    }
+
+    await user.save();
+
+    return res.json({
+      success: true,
+      hint,
+      remaining: usage ? 2 - usage.count : 1,
+    });
+
+  } catch (err) {
+    console.log("Hint error:", err);
+    return res.status(500).json({ success: false, message: "Failed to generate hint" });
+  }
+};
+

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { axiosClient } from "../utils/axiosClient";
 import { motion } from "framer-motion";
-import { useParams } from "react-router"; // ✅ useParams for admin access
+import { useParams } from "react-router";
 
 const difficultyColor = {
   easy: "text-green-400 bg-green-400/10",
@@ -11,18 +11,53 @@ const difficultyColor = {
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
+  const [rank, setRank] = useState("—");
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); // ✅ optional userId (for admin view)
+  const { id } = useParams(); // for admin view
 
   useEffect(() => {
     (async () => {
       try {
-        // ✅ Dynamic endpoint based on role
+        // 1️⃣ Fetch profile
         const endpoint = id ? `/user/getProfile/${id}` : "/user/getProfile";
-        const res = await axiosClient.get(endpoint);
-        setProfile(res.data.data);
+        const profileRes = await axiosClient.get(endpoint);
+
+        const userData = profileRes.data.data;
+        setProfile(userData);
+
+        // Safe extraction of user ID
+        const userId =
+          userData?._id || userData?.id || userData?.userId || null;
+
+        // console.log("USER PROFILE:", userData);
+        // console.log("PROFILE USER ID:", userId);
+
+        if (!userId) {
+          console.error("User ID missing in profile response!");
+          return;
+        }
+
+        // 2️⃣ Fetch leaderboard
+        const lbRes = await axiosClient.get("/leaderboard/all");
+        const lb = lbRes.data.leaderboard;
+        // console.log("LEADERBOARD:", lb);
+
+        // 3️⃣ Assign ranks based on sorted order
+        const ranked = lb.map((u, i) => ({
+          ...u,
+          rank: i + 1,
+        }));
+
+        // 4️⃣ Find this user's entry
+        const entry = ranked.find(
+          (u) => String(u.userId) === String(userId)
+        );
+
+        console.log("FOUND ENTRY:", entry);
+
+        setRank(entry?.rank || "—");
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error("Profile/Rank Fetch Error:", err);
       } finally {
         setLoading(false);
       }
@@ -69,7 +104,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats section */}
         <div className="mb-10">
           <div className="bg-gray-800/60 backdrop-blur-md rounded-xl p-5 flex justify-between items-center">
             <div>
@@ -78,11 +113,14 @@ export default function ProfilePage() {
                 {profile.totalSolved}
               </p>
             </div>
-            {profile.updatedAt && (
-              <p className="text-sm text-gray-500">
-                Last Updated: {new Date(profile.updatedAt).toLocaleString()}
+
+            {/* RANK DISPLAY */}
+            <div className="text-right">
+              <h2 className="text-lg text-gray-400">Rank</h2>
+              <p className="text-3xl font-bold text-yellow-400">
+                #{rank}
               </p>
-            )}
+            </div>
           </div>
         </div>
 
@@ -91,6 +129,7 @@ export default function ProfilePage() {
           <h2 className="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">
             Solved Problems
           </h2>
+
           {profile.problemsSolved.length === 0 ? (
             <p className="text-gray-500">No problems solved yet.</p>
           ) : (

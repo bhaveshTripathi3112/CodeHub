@@ -8,6 +8,8 @@ import { redisClient } from "./config/redis.js"
 import problemRouter from "./routes/problem.routes.js"
 import cors from 'cors';
 import submitRouter from "./routes/submission.routes.js"
+import discussionRouter from "./routes/discussion.routes.js"
+import leaderboardRouter from "./routes/leaderboard.routes.js"
 const app = express()
 
 //middleware
@@ -27,6 +29,8 @@ const port = process.env.PORT || 5000
 app.use("/user",authRouter)
 app.use("/problem",problemRouter)
 app.use("/submission",submitRouter)
+app.use("/discussion",discussionRouter)
+app.use("/leaderboard",leaderboardRouter)
 app.get("/", (req, res) => {
   res.send("Server is running successfully 🚀");
 });

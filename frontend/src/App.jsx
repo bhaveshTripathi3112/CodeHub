@@ -19,6 +19,7 @@ import RegisterAdminPage from "./pages/RegisterAdminPage";
 import AdminRoute from "./components/AdminRoute";
 import TrackUsersPage from "./pages/TrackUsersPage";
 import UserProfileForAdmin from "./pages/UserProfileForAdmin";
+import LeaderboardPage from "./pages/LeaderBoardPage";
 
 function App() {
   const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
@@ -62,7 +63,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/discussion" element={<DiscussionPage />} />
-
+        <Route path="/leaderboards" element={<LeaderboardPage />} />
         {/* ✅ Admin Route */}
         
         <Route

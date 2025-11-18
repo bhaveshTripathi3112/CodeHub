@@ -57,7 +57,7 @@ const Navbar = () => {
 
         {/* Center - Links */}
         <div className="hidden md:flex space-x-8 text-gray-300 font-medium">
-          {["problems", "about", "discussion"].map((path) => (
+          {["problems", "discussion","leaderboards", "about"].map((path) => (
             <NavLink
               key={path}
               to={`/${path}`}

@@ -40,7 +40,13 @@ const userSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true
+    },
+    hintUsage: [
+    {
+        problemId: { type: mongoose.Schema.Types.ObjectId, ref: "Problem" },
+        count: { type: Number, default: 0 }
     }
+    ]
 
 },{timestamps:true})
 

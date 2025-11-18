@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 import Editor from "@monaco-editor/react";
 import { motion } from "framer-motion";
 import { axiosClient } from "../utils/axiosClient";
-
+import Toast from "../components/Toaster";
 const languageOptions = ["c++", "java", "javascript"];
 
 export default function SolveProblemPage() {
@@ -25,6 +25,15 @@ export default function SolveProblemPage() {
   const [testCaseResults, setTestCaseResults] = useState([]); // array of booleans: true = passed
   const [hasAccepted, setHasAccepted] = useState(false);
   const [activeTestCase, setActiveTestCase] = useState(0);
+  const [hint, setHint] = useState("");
+  const [loadingHint, setLoadingHint] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [hintError, setHintError] = useState("");
+
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const editorRef = useRef(null);  // this line is relates to disabling copy paste option
 
@@ -173,10 +182,37 @@ export default function SolveProblemPage() {
       });
     }
   };
+const fetchHint = async () => {
+  try {
+    setLoadingHint(true);
+    setHint("");
+    setHintError(""); // new state for showing limit exceeded
+
+    const res = await axiosClient.post(`/problem/${id}/hint`);
+    setHint(res.data.hint);
+  } catch (err) {
+    const msg = err.response?.data?.message;
+
+    // If hint limit exceeded
+    if (err.response?.status === 403) {
+      setHintError(msg);   // show inside the hint box (NOT toast)
+      return;
+    }
+
+    // Other errors
+    setHintError("Unable to generate hint. Try again later.");
+  } finally {
+    setLoadingHint(false);
+  }
+};
+
+
+
 
   if (!problem) return <p className="p-6 text-gray-300">Loading problem...</p>;
 
   return (
+
     <div className="min-h-screen bg-[#0f1117] text-gray-200 flex flex-col md:flex-row">
       {/* LEFT PANEL */}
       <motion.div
@@ -185,85 +221,87 @@ export default function SolveProblemPage() {
         animate={{ opacity: 1, x: 0 }}
       >
         <div className="flex gap-3 mb-4">
-          {["description", "submissions", "solution"].map((tab) => (
-            <button
-              key={tab}
-              disabled={tab === "solution" && !hasAccepted}
-              onClick={() => {
-                setActiveTab(tab);
-                if (tab === "submissions") fetchSubmissions();
-              }}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition ${
-                activeTab === tab
-                  ? "bg-blue-600 text-white"
-                  : tab === "solution" && !hasAccepted
-                  ? "text-gray-500 cursor-not-allowed"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+         {["description", "submissions", "hint", "solution"].map((tab) => (
+          <button
+          key={tab}
+          disabled={
+            (tab === "solution" && !hasAccepted) ||
+            (tab === "hint" && loadingHint)
+          }
+          onClick={() => {
+            setActiveTab(tab);
+            if (tab === "submissions") fetchSubmissions();
+            if (tab === "hint") fetchHint();
+          }}
+          className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+            activeTab === tab
+              ? "bg-blue-600 text-white"
+              : tab === "solution" && !hasAccepted
+              ? "text-gray-500 cursor-not-allowed"
+              : "text-gray-300 hover:text-white"
+          }`}
+        >
+          {tab.charAt(0).toUpperCase() + tab.slice(1)}
+        </button>
+        ))}
+
         </div>
 
         {/* Description */}
-        {activeTab === "description" && (
-          
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <h1 className="text-2xl font-bold text-yellow-400">
-              {problem.title}
-            </h1>
-            <p className="text-gray-300 whitespace-pre-line" style={{ whiteSpace: "pre-line" }}>
-              {problem.description}
-            </p>
+       {activeTab === "description" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <h1 className="text-2xl font-bold text-yellow-400">{problem.title}</h1>
 
-            <p className="text-sm text-gray-400">
-              Difficulty:{" "}
-              <span
-                className={
-                  problem.difficultyLevel === "easy"
-                    ? "text-green-400"
-                    : problem.difficultyLevel === "medium"
-                    ? "text-yellow-400"
-                    : "text-red-400"
-                }
-              >
-                {problem.difficultyLevel}
-              </span>
-            </p>
+          <p className="text-gray-300 whitespace-pre-line">
+            {problem.description}
+          </p>
 
-            <h3 className="text-lg font-semibold text-green-400 mt-4">
-              Example Test Cases
-            </h3>
-            {problem.visibleTestCases?.map((t, i) => (
-              <div
-                key={i}
-                className="bg-[#1a1c23] border border-gray-700 p-3 rounded-md"
-              >
-                <p className="text-sm mb-2">
-                  <strong>Input:</strong>
-                  <div className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
-                    {String(t.input)}
-                  </div>
+          <p className="text-sm text-gray-400 mt-4">
+            Difficulty:{" "}
+            <span
+              className={
+                problem.difficultyLevel === "easy"
+                  ? "text-green-400"
+                  : problem.difficultyLevel === "medium"
+                  ? "text-yellow-400"
+                  : "text-red-400"
+              }
+            >
+              {problem.difficultyLevel}
+            </span>
+          </p>
+
+          <h3 className="text-lg font-semibold text-green-400 mt-4">
+            Example Test Cases
+          </h3>
+
+          {problem.visibleTestCases?.map((t, i) => (
+            <div
+              key={i}
+              className="bg-[#1a1c23] border border-gray-700 p-3 rounded-md"
+            >
+              <p className="text-sm mb-2">
+                <strong>Input:</strong>
+                <div className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
+                  {String(t.input)}
+                </div>
+              </p>
+
+              <p className="text-sm mb-2">
+                <strong>Expected Output:</strong>
+                <p className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
+                  {String(t.output)}
                 </p>
+              </p>
 
-                <p className="text-sm mb-2">
-                  <strong>Expected Output:</strong>
-                  <p className="whitespace-pre-wrap text-gray-200 bg-gray-800 rounded-lg p-2 mt-1">
-                    {String(t.output)}
-                  </p>
-                </p>
+              {t.explanation && (
+                <p className="text-xs text-gray-400 mt-1">{t.explanation}</p>
+              )}
+            </div>
+          ))}
+        </motion.div>
+      )}
 
-                {t.explanation && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    {t.explanation}
-                  </p>
-                )}
-              </div>
-
-            ))}
-          </motion.div>
-        )}
 
         {/* Submissions */}
         {activeTab === "submissions" && (
@@ -372,8 +410,47 @@ export default function SolveProblemPage() {
             </pre>
           </motion.div>
         )}
+
+        {/* Hints */}
+        {activeTab === "hint" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#1a1c23] p-4 mt-3 rounded-lg border border-grey-300"
+        >
+          <h2 className="text-xl font-semibold text-purple-400 mb-2">
+            🔍 Hint
+          </h2>
+          {/* Limit exceeded message */}
+          {hintError && (
+            <div className="p-3 rounded-md bg-red-900/30 border border-red-400 mb-3">
+              <p className="text-red-300 font-medium">{hintError}</p>
+            </div>
+          )}
+          {loadingHint ? (
+            <p className="text-gray-400 animate-pulse">Generating hint...</p>
+          ) : hint ? (
+            <p className="text-gray-200 whitespace-pre-line">{hint}</p>
+          ) : (
+            <p className="text-gray-500">Click the button to get a hint.</p>
+          )}
+
+          <button
+            onClick={fetchHint}
+            disabled={loadingHint}
+            className={`mt-3 px-4 py-2 rounded-md text-white ${
+              loadingHint ? "bg-gray-700" : "bg-purple-600 hover:bg-purple-700"
+            }`}
+          >
+            {loadingHint ? "Getting Hint..." : "Get Hint"}
+          </button>
+        </motion.div>
+      )}
+
+
       </motion.div>
 
+        
       {/* RIGHT PANEL */}
       <motion.div
         className="md:w-1/2 flex flex-col p-6 overflow-y-auto"
