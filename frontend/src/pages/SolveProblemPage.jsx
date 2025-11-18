@@ -105,7 +105,7 @@ export default function SolveProblemPage() {
         return;
       }
 
-      // ⭐ USE ONLY VISIBLE TEST CASES FOR RUN
+      // USE ONLY VISIBLE TEST CASES FOR RUN
       const totalVisible = problem.visibleTestCases.length;
 
       const passed = data.testCasesPassed ?? 0;

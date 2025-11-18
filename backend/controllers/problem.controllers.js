@@ -234,6 +234,23 @@ export const submittedProblem = async(req,res)=>{
 }
 
 
+export const getProblemByIdAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const problem = await Problem.findById(id);
+
+    if (!problem) {
+      return res.status(404).json({ message: "Problem not found" });
+    }
+
+    // Return everything — admin needs full details
+    res.status(200).json(problem);
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
 
 // INIT GEMINI

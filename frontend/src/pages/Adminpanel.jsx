@@ -17,7 +17,7 @@ function AdminPanel() {
       title: "Update Problem",
       description: "Modify existing problem details like title or difficulty.",
       gradient: "from-green-500 to-emerald-600",
-      onClick: () => navigate("/admin/updateProblem"),
+      onClick: () => navigate("/admin/problemPage"),
        button:"update"
     },
     {

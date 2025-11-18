@@ -20,6 +20,7 @@ import AdminRoute from "./components/AdminRoute";
 import TrackUsersPage from "./pages/TrackUsersPage";
 import UserProfileForAdmin from "./pages/UserProfileForAdmin";
 import LeaderboardPage from "./pages/LeaderBoardPage";
+import ProblemListPage from "./pages/ProblemListPageForAdmin";
 
 function App() {
   const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
@@ -82,14 +83,25 @@ function App() {
             </AdminRoute>
           }
         />
+
         <Route
-          path="/admin/updateProblem"
+          path="/admin/problemPage"
+          element={
+            <AdminRoute>
+              <ProblemListPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/problemPage/updateProblem/:id"
           element={
             <AdminRoute>
               <UpdateProblemPage />
             </AdminRoute>
           }
         />
+
         <Route
           path="/admin/deleteProblem"
           element={
