@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const axiosClient = axios.create({
-    baseURL:'http://localhost:8000',
+    baseURL:'https://codehub-backend-qyqw.onrender.com',
     withCredentials:true,
     headers:{
         'Content-Type' : 'application/json'
