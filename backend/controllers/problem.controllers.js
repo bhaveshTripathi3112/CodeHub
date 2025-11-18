@@ -11,6 +11,16 @@ export const createProblem = async(req,res)=>{
         hiddenTestCases,startCode,referenceSolution,problemCreator} = req.body
     try {
 
+
+        // CHECK IF PROBLEM TITLE ALREADY EXISTS
+        const existing = await Problem.findOne({ title: title.trim() });
+        if (existing) {
+        return res.status(400).json({
+            success: false,
+            message: "A problem with this title already exists!",
+        });
+        }
+
         //! if the below for loop executes fully means admin ne jo data bheja hia wo ekdum picture perfect hai aur usko ham DB mein store kar skte hai 
         
         for(const {language , completeCode} of referenceSolution){
