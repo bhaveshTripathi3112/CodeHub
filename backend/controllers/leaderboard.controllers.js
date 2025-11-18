@@ -19,7 +19,7 @@ export const getLeaderboard = async (req, res) => {
 
       return {
         userId: user._id,
-        name: `${user.firstName} ${user.lastName}`,
+        name: `${user.firstName}`,
         email: user.emailId,
         easyCount,
         mediumCount,
