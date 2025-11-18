@@ -6,6 +6,7 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router";
 import Toast from "../components/Toaster";
+import { axiosClient } from "../utils/axiosClient";
 
 // validation schema
 const adminRegisterSchema = z.object({
@@ -36,7 +37,7 @@ function AdminRegister() {
   const onSubmit = async (data) => {
     try {
       const adminData = { ...data, role: "admin" };
-      const res = await axios.post("http://localhost:8000/user/admin/register", adminData, {
+      const res = await axiosClient.post("/user/admin/register", adminData, {
         withCredentials: true,
     });
 
